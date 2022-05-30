@@ -81,57 +81,103 @@ def Open():
             password = 256809,
             port = 5433)
 
-        root2 = Tk()
-        root2.geometry("310x100")
-        
-        Label1 = Label(root2, text = "Write a File's Name").grid(row = 0, column = 0, pady = 10, padx = 10, columnspan = 2)   
-        nameFile = Entry(root2, width = 20)
-        nameFile.grid(row = 1, column = 0, padx = 15)
-
-        OR = Label(root2, text = "Or").grid(row = 0, column = 1)
-
-        Label2 = Label(root2, text = "Choose resent File").grid(row = 0, column = 2, pady = 10, padx = 10, columnspan = 2)
-
         cur = conn.cursor()
-
-        select_script = """SELECT DISTINCT names FROM files 
-        LIMIT 5"""
-
-        cur.execute(select_script)
-        files = []
-        for i in cur.fetchall():
-            for x in i:
-                files.append(x + ".txt")
-
-        clicked = StringVar()
-        clicked.set(files[0])
-
-        resent_files = OptionMenu(root2, clicked, *files)
-        resent_files.grid(row = 1, column = 2)
         
-        def ConfirmOpen():
-            try:
+        try:
+            select_script = """SELECT DISTINCT names FROM files 
+            LIMIT 5"""
+
+            cur.execute(select_script)
+
+            root2 = Tk()
+            root2.geometry("310x100")
+            root2.resizable(False, False)
+            
+            Label1 = Label(root2, text = "Write a File's Name").grid(row = 0, column = 0, pady = 10, padx = 10, columnspan = 2)   
+            nameFile = Entry(root2, width = 20)
+            nameFile.grid(row = 1, column = 0, padx = 15)
+
+            OR = Label(root2, text = "Or").grid(row = 0, column = 1)
+
+            Label2 = Label(root2, text = "Choose resent File").grid(row = 0, column = 2, pady = 10, padx = 10, columnspan = 2)
+
+            files = []
+            for i in cur.fetchall():
+                for x in i:
+                    files.append(x + ".txt")
+
+            clicked = StringVar()
+
+            resent_files = OptionMenu(root2, clicked, *files)
+            resent_files.grid(row = 1, column = 2)
+            
+            def ConfirmOpen():
+                try:
+                    date = dt.datetime.now()
+                    str_date = str(date)
+                    getting = clicked.get()        
+
+                    insert_script = "INSERT INTO files VALUES(%s, %s)"
+                    insert_value = (getting[:-4], str_date)
+
+                    cur.execute(insert_script, insert_value)
+
+                    file = open(getting, "r+")
+                    fieldOfFile.insert(1.0, *file)
+                    root2.destroy()
+                    file.close()
+
+                except:
+                    date = dt.datetime.now()
+                    str_date = str(date)
+                    getting = nameFile.get()        
+
+                    insert_script = "INSERT INTO files VALUES(%s, %s)"
+                    insert_value = (getting + "txt", str_date)
+
+                    cur.execute(insert_script, insert_value)
+
+                    file = open(getting + ".txt", "r+")
+                    fieldOfFile.insert(1.0, *file)
+                    root2.destroy()
+                    file.close()
+
+            confirmButton = Button(root2, text = "OPEN", command = ConfirmOpen).grid(row = 2, column = 0, columnspan = 3, ipadx = 130)
+
+            root2.mainloop()
+            root2.destroy()
+
+        except:
+            create_script = """CREATE TABLE IF NOT EXISTS files(
+                names varchar(255),
+                dates varchar(50))"""
+
+            cur.execute(create_script)            
+
+            root2 = Tk()
+            root2.geometry("155x100")
+            root2.resizable(False, False)
+            
+            Label1 = Label(root2, text = "Write a File's Name").grid(row = 0, column = 0, pady = 10, padx = 10, columnspan = 2)   
+            nameFile = Entry(root2, width = 20)
+            nameFile.grid(row = 1, column = 0, padx = 15)
+
+            def ConfirmOpen():                            
+                
                 date = dt.datetime.now()
                 str_date = str(date)
-                getting = clicked.get()        
-
+                getting = nameFile.get()        
                 insert_script = "INSERT INTO files VALUES(%s, %s)"
-                insert_value = (getting[:-4], str_date)
-
+                insert_value = (getting + "txt", str_date)
                 cur.execute(insert_script, insert_value)
-
-                file = open(getting, "r+")
+                file = open(getting + ".txt", "r+")
                 fieldOfFile.insert(1.0, *file)
                 root2.destroy()
                 file.close()
 
-            except:
-                pass
+            confirmButton = Button(root2, text = "OPEN", command = ConfirmOpen).grid(row = 2, column = 0, columnspan = 3, ipadx = 57, ipady = 10)
 
-
-        confirmButton = Button(root2, text = "OPEN", command = ConfirmOpen).grid(row = 2, column = 0, columnspan = 3, ipadx = 130)
-
-        root2.mainloop()
+            root2.mainloop()
 
         conn.commit()
 
