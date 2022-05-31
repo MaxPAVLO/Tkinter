@@ -56,6 +56,7 @@ def Save():
                 cur.close() 
 
     root2 = Tk()
+    root2.title("Saving")
     root2.resizable(False, False)
 
     File = Label(root2, text = "Name of File").pack()
@@ -90,6 +91,7 @@ def Open():
             
             cur.execute(select_script)
             root2 = Tk()
+            root2.title("Opening")
             root2.geometry("310x100")
             root2.resizable(False, False)
             
@@ -139,6 +141,7 @@ def Open():
         
         except:    
             root2 = Tk()
+            root2.title("Opening")
             root2.geometry("310x100")
             root2.resizable(False, False)
             
@@ -196,7 +199,7 @@ def Open():
         if cur is not None:
             cur.close()
 
-fieldOfFile = Text(root, width = 71, height = 12, font = (7))
+fieldOfFile = Text(root, width = 58, height = 12, font = (7))
 fieldOfFile.grid(row = 0, column = 0, columnspan = 3)
 
 SaveButton = Button(root, text = "SAVE", command = Save).grid(row = 1, column = 0, ipadx = 82, ipady = 10)
